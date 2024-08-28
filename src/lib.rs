@@ -10,10 +10,12 @@ impl Lexer{
                     ')' => println!("RIGHT_PAREN ) null"),
                     '{' => println!("LEFT_BRACE {{ null"),
                     '}' => println!("RIGHT_BRACE }} null"),
-                    '*' => println!("STAR * null"),
+                   ',' => println!("COMMA , null"),
                     '.' => println!("DOT . null"),
+                    '-' => println!("MINUS - null"),
                     '+' => println!("PLUS + null"),
-                    ',' => println!("COMMA , null"),
+                    ';' => println!("SEMICOLON ; null"),
+                    '*' => println!("STAR * null"),
                     c => {
                         println!("[{}]Error: Unexpected character:{}",line_number + 1,c);
                         result = 65;
