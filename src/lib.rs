@@ -17,7 +17,7 @@ impl Lexer{
                     ';' => println!("SEMICOLON ; null"),
                     '*' => println!("STAR * null"),
                     c => {
-                        println!("[{}]Error: Unexpected character:{}",line_number + 1,c);
+                        eprintln!("[line {}] Error: Unexpected character: {}",line_number + 1,c);
                         result = 65;
                     }
                 }
