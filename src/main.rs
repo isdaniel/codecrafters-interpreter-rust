@@ -1,6 +1,8 @@
 use std::env;
 use std::fs;
 use std::io::{self, Write};
+use std::process::exit;
+use codecrafters_interpreter::Lexer;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -17,29 +19,17 @@ fn main() {
             // You can use print statements as follows for debugging, they'll be visible when running tests.
             writeln!(io::stderr(), "Logs from your program will appear here!").unwrap();
 
-            let file_contents = fs::read_to_string(filename).unwrap_or_else(|_| {
+            let file_contents: String = fs::read_to_string(filename).unwrap_or_else(|_| {
                 writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
                 String::new()
             });
-
-            tokenize(&file_contents);
+            
+            let result = Lexer::lex(&file_contents);
+            exit(result);
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
             return;
         }
     }
-}
-
-fn tokenize(input: &str) {
-    for char in input.chars() {
-        match char {
-            '(' => println!("LEFT_PAREN ( null"),
-            ')' => println!("RIGHT_PAREN ) null"),
-            '{' => println!("LEFT_BRACE {{ null"),
-            '}' => println!("RIGHT_BRACE }} null"),
-            _ => {} // Ignore other characters for now
-        }
-    }
-    println!("EOF  null");
 }
