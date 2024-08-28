@@ -10,7 +10,7 @@ impl Lexer{
                     ')' => println!("RIGHT_PAREN ) null"),
                     '{' => println!("LEFT_BRACE {{ null"),
                     '}' => println!("RIGHT_BRACE }} null"),
-                   ',' => println!("COMMA , null"),
+                    ',' => println!("COMMA , null"),
                     '.' => println!("DOT . null"),
                     '-' => println!("MINUS - null"),
                     '+' => println!("PLUS + null"),
