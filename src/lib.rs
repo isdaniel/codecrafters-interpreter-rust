@@ -18,6 +18,14 @@ impl Lexer {
                 '+' => println!("PLUS + null"),
                 ';' => println!("SEMICOLON ; null"),
                 '*' => println!("STAR * null"),
+                '!' => {
+                    if chars.peek() == Some(&'=') {
+                        chars.next(); 
+                        println!("BANG_EQUAL != null");
+                    } else {
+                        println!("BANG ! null");
+                    }
+                },
                 '=' => {
                     if chars.peek() == Some(&'=') {
                         chars.next(); 
