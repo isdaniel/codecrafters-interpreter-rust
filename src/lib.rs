@@ -49,7 +49,18 @@ impl Lexer {
                     } else {
                         println!("LESS < null");
                     }
-                }
+                },
+                '/' => {
+                    if chars.peek() == Some(&'/') {
+                        while let Some(char) = chars.next() {
+                            if char == '\n' || char == '\0' {
+                                break;
+                            }
+                        }
+                    } else {
+                        println!("SLASH / null");
+                    }
+                },
                 '\n' => line_number += 1,
                 c => {
                     eprintln!("[line {}] Error: Unexpected character: {}", line_number, c);
