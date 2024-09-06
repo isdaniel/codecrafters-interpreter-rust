@@ -2,7 +2,7 @@ use std::env;
 use std::fs;
 use std::io::{self, Write};
 use std::process::exit;
-use codecrafters_interpreter::Lexer;
+use codecrafters_interpreter as imp;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
@@ -13,7 +13,7 @@ fn main() {
 
     let command = &args[1];
     let filename = &args[2];
-
+    let mut any_cc_err = false;
     match command.as_str() {
         "tokenize" => {
             // You can use print statements as follows for debugging, they'll be visible when running tests.
@@ -24,8 +24,31 @@ fn main() {
                 String::new()
             });
             
-            let result = Lexer::lex(&file_contents);
-            exit(result);
+            //let result = Lexer::lex(&file_contents);
+            let lex = imp::Lexer::new(&file_contents);
+            for token in lex {
+                let token = match token{
+                    Ok(t) => t, 
+                    Err(e) =>{
+                        eprintln!("{e:?}");
+                        if let Some(unrecognized) = e.downcast_ref::<imp::lex::SingleTokenError>() {
+                            any_cc_err = true;
+                            eprintln!(
+                                "[line {}] Error: Unexpected character: {}",
+                                unrecognized.line(),
+                                unrecognized.token
+                            );
+                        } 
+                        continue;
+
+                    }
+                };
+                println!("{token}");
+            }
+            println!("EOF  null");
+            if any_cc_err {
+                exit(65);
+            }
         }
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
