@@ -103,7 +103,7 @@ impl fmt::Display for Token<'_> {
             TokenKind::Slash => write!(f,"SLASH {origin} null"),
             TokenKind::Bang => write!(f,"BANG {origin} null"),
             TokenKind::Equal =>  write!(f,"EQUAL {origin} null"),
-            TokenKind::String => write!(f, "STRING \"{origin}\" foo baz"),
+            TokenKind::String => write!(f, "STRING "{origin}" foo baz"),
             TokenKind::Ident => write!(f, "IDENTIFIER {origin} null"),
             TokenKind::Number(val) => {
                 if val == val.trunc(){
