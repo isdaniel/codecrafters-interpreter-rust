@@ -30,12 +30,30 @@ pub struct SingleTokenError {
     err_span: SourceSpan,
 }
 
+#[derive(Diagnostic, Debug, Error)]
+#[error("Unterminated string.")]
+pub struct SingleTerminatedError{
+    #[source_code]
+    src: String,
+
+    #[label = "this input character"]
+    err_span: SourceSpan,
+}
+
 impl SingleTokenError{
     pub fn line(&self) -> usize{
         let until_unrecongized = &self.src[..=self.err_span.offset()];
         until_unrecongized.lines().count()
     }
 }
+
+impl SingleTerminatedError{
+    pub fn line(&self) -> usize{
+        let until_unrecongized = &self.src[..=self.err_span.offset()];
+        until_unrecongized.lines().count()
+    }
+}
+
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum TokenKind {
@@ -103,7 +121,7 @@ impl fmt::Display for Token<'_> {
             TokenKind::Slash => write!(f,"SLASH {origin} null"),
             TokenKind::Bang => write!(f,"BANG {origin} null"),
             TokenKind::Equal =>  write!(f,"EQUAL {origin} null"),
-            TokenKind::String => write!(f, "STRING "{origin}" foo baz"),
+            TokenKind::String => write!(f, "STRING {origin} {}",Token::unescape(origin)),
             TokenKind::Ident => write!(f, "IDENTIFIER {origin} null"),
             TokenKind::Number(val) => {
                 if val == val.trunc(){
@@ -129,6 +147,14 @@ impl fmt::Display for Token<'_> {
             TokenKind::Var => write!(f, "VAR {origin} null"),
             TokenKind::While => write!(f, "WHILE {origin} null"),
         }
+    }
+}
+
+impl Token<'_> {
+    pub fn unescape<'de>(s: &'de str) -> Cow<'de, str> {
+        // Lox has no escaping, so just remove the "
+        // Since it has no escaping, strings can't contain ", so trim won't trim multiple
+        Cow::Borrowed(s.trim_matches('"'))
     }
 }
 
@@ -188,15 +214,25 @@ impl<'de> Iterator for Lexer<'de>{
 
             break match started {
                 Started::String => {
-                    let end = self.rest.find('"').unwrap();
-                    let literal = &c_onwards[..end + 1 + 1];
-                    self.byte += end + 1;
-                    self.rest = &self.rest[end + 1..];
-                    Some(Ok(Token {
-                        origin: literal,
-                        offset: c_at,
-                        kind: TokenKind::String,
-                    }))
+                    if let Some(end) = self.rest.find('"') {
+                        let literal = &c_onwards[..end + 1 + 1];
+                        self.byte += end + 1;
+                        self.rest = &self.rest[end + 1..];
+                        return Some(Ok(Token {
+                            origin: literal,
+                            offset: c_at,
+                            kind: TokenKind::String,
+                        }));
+                    } 
+
+                    let err = SingleTerminatedError{
+                        src : self.whole.to_string(),
+                        err_span: SourceSpan::from(self.byte - c.len_utf8()..self.whole.len())
+                    };
+                    self.byte += self.rest.len();
+                    self.rest = &self.rest[self.rest.len()..];
+
+                    return Some(Err(err.into()));
                 }
                 Started::Slash => {
                     if self.rest.starts_with('/') {

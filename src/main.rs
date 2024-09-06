@@ -31,14 +31,19 @@ fn main() {
                     Ok(t) => t, 
                     Err(e) =>{
                         eprintln!("{e:?}");
+                        any_cc_err = true;
                         if let Some(unrecognized) = e.downcast_ref::<imp::lex::SingleTokenError>() {
-                            any_cc_err = true;
                             eprintln!(
                                 "[line {}] Error: Unexpected character: {}",
                                 unrecognized.line(),
                                 unrecognized.token
                             );
-                        } 
+                        } else if let Some(unterminated) = e.downcast_ref::<imp::lex::SingleTerminatedError>(){
+                            eprintln!(
+                                "[line {}] Error: Unterminated string.",
+                                unterminated.line()
+                            );
+                        }
                         continue;
 
                     }
