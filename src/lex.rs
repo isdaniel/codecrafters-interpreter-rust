@@ -17,7 +17,6 @@ pub struct Token<'de> {
     pub kind: TokenKind,
 }
 
-
 #[derive(Diagnostic, Debug, Error)]
 #[error("Unexpected token '{token}'")]
 pub struct SingleTokenError {
@@ -83,6 +82,7 @@ pub enum TokenKind {
     Class,
     Else,
     False,
+    True,
     For,
     Fun,
     If,
@@ -92,7 +92,6 @@ pub enum TokenKind {
     Return,
     Super,
     This,
-    True,
     Var,
     While,
 }

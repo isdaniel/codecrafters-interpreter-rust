@@ -54,7 +54,17 @@ fn main() {
             if any_cc_err {
                 exit(65);
             }
-        }
+        },
+        "parse" =>{
+            let file_contents: String = fs::read_to_string(filename).unwrap_or_else(|_| {
+                writeln!(io::stderr(), "Failed to read file {}", filename).unwrap();
+                String::new()
+            });
+
+            let mut parser = imp::Parser::new(&file_contents);
+            parser.parse_expression_within();
+            
+        },
         _ => {
             writeln!(io::stderr(), "Unknown command: {}", command).unwrap();
             return;
