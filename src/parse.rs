@@ -80,7 +80,7 @@ impl<'a> Parser<'a>{
                         TokenKind::Slash => todo!(),
                         TokenKind::Bang => todo!(),
                         TokenKind::Equal => todo!(),
-                        TokenKind::String => todo!(),
+                        TokenKind::String => Expr::String(token),
                         TokenKind::Ident => todo!(),
                         TokenKind::Number(val) => Expr::Number(val),
                         TokenKind::And => todo!(),
