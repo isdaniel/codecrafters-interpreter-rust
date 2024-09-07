@@ -33,7 +33,7 @@ impl<'a> Display for Expr<'a> {
             Expr::Bool(b) => write!(f,"{b}"),
             Expr::Nil => f.write_str("nil"),
             Expr::Number(n) => write!(f,"{n:?}"),
-            Expr::String(s) => write!(f,"{s:?}"),
+            Expr::String(s) => write!(f,"{s}"),
             Expr::Unary { operator, right } => {
                 f.write_fmt(format_args!("{} {right}", operator.origin))
             }
@@ -80,7 +80,7 @@ impl<'a> Parser<'a>{
                         TokenKind::Slash => todo!(),
                         TokenKind::Bang => todo!(),
                         TokenKind::Equal => todo!(),
-                        TokenKind::String => Expr::String(token),
+                        TokenKind::String => Expr::String(token.origin.trim_matches('"')),
                         TokenKind::Ident => todo!(),
                         TokenKind::Number(val) => Expr::Number(val),
                         TokenKind::And => todo!(),
