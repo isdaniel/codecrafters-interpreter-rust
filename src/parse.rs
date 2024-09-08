@@ -54,53 +54,59 @@ impl<'a> Parser<'a>{
         }
     }
 
+    // fn parse_expression(&mut self) -> Expr<'a>{
+    //     self.parse_binary_expression(0) 
+    // }
+    
+    fn parse_binary_expression(&mut self, operator:Toke<'a>) -> Expr<'a>{
+        let left = self.parse_primary_expression();
+        let right = self.parse_primary_expression();
+        Expr::Binary{
+            operator,
+            left: Box::new(left)
+            right: Box::new(right)
+        }
+    }
+    
+    fn parse_primary_expression(&mut self) -> Expr<'a> {
+        match self.lexer.next() {
+            Some(Ok(token)) => match token.kind {
+                TokenKind::Number(val) => Expr::Number(val),
+                TokenKind::String => Expr::String(token.origin.trim_matches('"')),
+                TokenKind::True => Expr::Bool(true),
+                TokenKind::False => Expr::Bool(false),
+                TokenKind::Nil => Expr::Nil,
+                TokenKind::LeftParen => {
+                    let expr = self.parse_binary_expression(0);
+                    if let Some(Ok(Token { kind: TokenKind::RightParen, .. })) = self.lexer.next() {
+                        expr
+                    } else {
+                        panic!("Expected closing parenthesis");
+                    }
+                }
+                _ => panic!("Unexpected token: {:?}", token.kind),
+            },
+            Some(Err(_)) => panic!("Lexer error"),
+            None => panic!("Unexpected end of input"),
+        }
+    }
+    
+
     pub fn parse_expression_within(&mut self)  {
         let mut exprs = Vec::new();
-        loop {
-            let Some((t)) = self.lexer.next() else { break; };
+        while let Some(t) = self.lexer.next(){
             match t {
                 Ok(token) => {
                     let expr = match token.kind{
-                        TokenKind::LeftParen => todo!(),
+                        TokenKind::LeftParen => self.parse_binary_expression(0),
                         TokenKind::RightParen => todo!(),
-                        TokenKind::LeftBrace => todo!(),
-                        TokenKind::RightBrace => todo!(),
-                        TokenKind::Comma => todo!(),
-                        TokenKind::Dot => todo!(),
-                        TokenKind::Minus => todo!(),
-                        TokenKind::Plus =>  todo!(),
-                        TokenKind::Semicolon => todo!(),
-                        TokenKind::Star => todo!(),
-                        TokenKind::BangEqual => todo!(),
-                        TokenKind::EqualEqual => todo!(),
-                        TokenKind::LessEqual => todo!(),
-                        TokenKind::GreaterEqual => todo!(),
-                        TokenKind::Less => todo!(),
-                        TokenKind::Greater => todo!(),
-                        TokenKind::Slash => todo!(),
-                        TokenKind::Bang => todo!(),
-                        TokenKind::Equal => todo!(),
                         TokenKind::String => Expr::String(token.origin.trim_matches('"')),
-                        TokenKind::Ident => todo!(),
                         TokenKind::Number(val) => Expr::Number(val),
-                        TokenKind::And => todo!(),
-                        TokenKind::Class => todo!(),
-                        TokenKind::Else => todo!(),
                         TokenKind::False => Expr::Bool(false),
                         TokenKind::True => Expr::Bool(true),
-                        TokenKind::For => todo!(),
-                        TokenKind::Fun => todo!(),
-                        TokenKind::If => todo!(),
                         TokenKind::Nil => Expr::Nil,
-                        TokenKind::Or => todo!(),
-                        TokenKind::Print => todo!(),
-                        TokenKind::Return => todo!(),
-                        TokenKind::Super => todo!(),
-                        TokenKind::This => todo!(),
-                        TokenKind::Var => todo!(),
-                        TokenKind::While => todo!(),
+                        _ => todo!(),
                     };
-
                     exprs.push(expr);
                 },
                 Err(_) => todo!(),
